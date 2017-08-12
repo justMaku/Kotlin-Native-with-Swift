@@ -10,6 +10,8 @@ PATH=$KOTLIN_HOME/dist/dependencies/clang-llvm-3.9.0-darwin-macos/bin/:$PATH
 TARGET=iphone
 
 # Compile Kotlin code to LLVM bytecode
+# -nomain will allow us to have non-executable binary
+# -produce will make sure we output LLVM bytecode
 echo "Compiling Kotlin Code"
 konanc \
     -target $TARGET \
@@ -18,6 +20,7 @@ konanc \
     $DIR/kotlin.kt -o kotlin.bc
 
 # Compile C++ Launcher to LLVM bytecode
+# -emit-llvm is the argument used to achieve that.
 echo "Compiling C++ Code"
 clang++ \
     -std=c++11 \
@@ -32,6 +35,7 @@ clang++ \
     launcher.cpp
 
 # Link everything together
+# We use -exported-symbol argument to tell the linker about the functions we want to be able to call later
 echo "Linking"
 llvm-lto \
     -o kotlin.o \
@@ -46,10 +50,10 @@ llvm-lto \
 echo "Bundling as a library"
 libtool -static kotlin.o -o kotlin.a
 
-# Remove Build Artifcats
+# Remove Build Artifacts
 rm -rf *.bc
 rm -rf *.o
 
 # Dump build product information
 otool -hv kotlin.a
-echo "Library built sucessfully"
+echo "Library built successfully"

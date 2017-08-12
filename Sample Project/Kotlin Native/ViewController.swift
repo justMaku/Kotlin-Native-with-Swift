@@ -18,7 +18,7 @@ class ViewController: UIViewController {
         super.viewDidAppear(animated)
         
         if let retVal = kotlin_wrapper() {
-            let string = String.init(cString: retVal)
+            let string = String(cString: retVal)
             let alertController = UIAlertController(title: "Kotlin says:", message: string, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "Okay?", style: .default, handler: nil))
             present(alertController, animated: true, completion: nil)
