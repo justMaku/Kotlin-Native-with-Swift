@@ -1,0 +1,3 @@
+[submodule "Kotlin Native"]
+	path = Kotlin Native
+	url = git@github.com:JetBrains/kotlin-native.git
