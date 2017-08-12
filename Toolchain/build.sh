@@ -2,7 +2,7 @@
 set -e
 set -o pipefail
 
-KOTLIN_HOME=../Kotlin\ Native # CHANGE THIS
+KOTLIN_HOME=../KotlinNative
 DIR=.
 PATH=$KOTLIN_HOME/dist/bin:$PATH
 PATH=$KOTLIN_HOME/bin:$PATH
@@ -10,15 +10,15 @@ PATH=$KOTLIN_HOME/dist/dependencies/clang-llvm-3.9.0-darwin-macos/bin/:$PATH
 TARGET=iphone
 
 # Compile Kotlin code to LLVM bytecode
+echo "Compiling Kotlin Code"
 konanc \
     -target $TARGET \
-    -nomain \ 
+    -nomain \
     -produce bitcode \
     $DIR/kotlin.kt -o kotlin.bc
 
-
-
 # Compile C++ Launcher to LLVM bytecode
+echo "Compiling C++ Code"
 clang++ \
     -std=c++11 \
     -stdlib=libc++ \
@@ -32,6 +32,7 @@ clang++ \
     launcher.cpp
 
 # Link everything together
+echo "Linking"
 llvm-lto \
     -o kotlin.o \
     -exported-symbol=_kotlin_wrapper \
@@ -42,6 +43,7 @@ llvm-lto \
     kotlin.bc launcher.bc 
 
 # Convert the object file to a static library
+echo "Bundling as a library"
 libtool -static kotlin.o -o kotlin.a
 
 # Remove Build Artifcats
@@ -50,3 +52,4 @@ rm -rf *.o
 
 # Dump build product information
 otool -hv kotlin.a
+echo "Library built sucessfully"
